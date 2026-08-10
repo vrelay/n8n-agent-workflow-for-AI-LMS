@@ -26,7 +26,7 @@ Only the modules that teach clear ideas (trigger → agent → output, tools lat
 |------|--------|
 | Lesson | **Homework Helper** — answer a question using only the student's pasted notes |
 | Workflow | Manual Trigger → `My Notes` (Set) → `Helper` (HTTP to OpenRouter) → response shown in n8n execution output |
-| Engine | n8n in Docker Compose (prod image or local `n8n/` submodule for UI work) + Postgres |
+| Engine | n8n in Docker Compose (image built from local `n8n/` submodule) + Postgres |
 | LLM | OpenRouter via HTTP Request node (key from env / operator) |
 | Auth | n8n's built-in owner account (mandatory since n8n 1.0) |
 | Tenancy | One shared n8n + Postgres. Per-tenant = duplicate this setup later |
@@ -63,12 +63,13 @@ Lesson 2 candidate (same nodes): **Quiz Coach** — notes in → three easy Q&As
 
 | File | Mode | n8n |
 |------|------|-----|
-| `docker-compose.yml` | **prod** | official `n8nio/n8n:2.34.4` image |
-| `docker-compose.dev.yml` | **dev** | builds `Dockerfile.dev`, mounts `./n8n` (your UI patches) |
+| `docker-compose.yml` | **prod** | builds `ai-lms/n8n` from local `./n8n` (LMS UI included) |
+| `docker-compose.dev.yml` | **dev** | builds `Dockerfile.dev`, mounts `./n8n` (live UI patches) |
 
 Both include Postgres. Editor: http://localhost:5678
 
-- **Pinned version:** `N8N_VERSION=2.34.4` in `.env`
+- **Pinned version / image tag:** `N8N_VERSION=2.34.4` in `.env` → `ai-lms/n8n:2.34.4`
+- **Prod image build:** `./docker/build-prod-image.sh` (runs `pnpm build:n8n` then `docker compose build`)
 - **UI package to edit (dev):** `n8n/packages/frontend/editor-ui`
 - **Update n8n submodule later:** `cd n8n && git fetch --depth 1 origin tag n8n@<new-version> && git switch --detach n8n@<new-version>`
 
@@ -78,9 +79,10 @@ Both include Postgres. Editor: http://localhost:5678
 n8n-agent-workflow-for-AI-LMS/
   README.md
   AGENTS.md                   # for agents: find UI, LMS comment style, rebuild cmds
-  docker-compose.yml          # prod: Postgres + n8nio/n8n
+  docker-compose.yml          # prod: Postgres + image built from ./n8n
   docker-compose.dev.yml      # dev: Postgres + local n8n/ mount
   Dockerfile.dev              # Node 24 image for the dev n8n service
+  docker/build-prod-image.sh  # compile ./n8n → ai-lms/n8n image
   docker/dev-entrypoint.sh    # install/build if needed, then pnpm start
   .env.example                # OPENROUTER_API_KEY, DB creds, n8n env
   n8n/                        # fork submodule (vrelay/n8n, branch ai-lms)
@@ -102,11 +104,12 @@ n8n-agent-workflow-for-AI-LMS/
 cp .env.example .env
 # edit .env: set OPENROUTER_API_KEY and N8N_ENCRYPTION_KEY
 
-# Production (stock n8n image)
+# Production (n8n image built from local ./n8n submodule)
+git submodule update --init
+./docker/build-prod-image.sh
 docker compose up -d
 
-# OR development (local n8n/ submodule with UI edits)
-git submodule update --init
+# OR development (bind-mounted ./n8n with faster UI rebuild loop)
 docker compose -f docker-compose.dev.yml up --build
 ```
 
@@ -132,7 +135,7 @@ Full details in `docs/runbook.md`.
 ## Status
 
 - [x] Product framing
-- [x] Docker Compose starter: Postgres + n8n (prod image / dev submodule) + Homework Helper workflow
+- [x] Docker Compose starter: Postgres + n8n built from `./n8n` (prod image / dev submodule) + Homework Helper workflow
 - [x] Student editor strip-down in `n8n/` (`ai-lms`): hide sidebar/tabs/publish/tags; flat node allowlist; tabbed NDV; slim menus — see `AGENTS.md`
 - [ ] Guided mode (click-by-click help on a premade path)
 - [ ] Multi-tenant compose-per-tenant — later

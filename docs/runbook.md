@@ -11,13 +11,19 @@ Edit `.env` and set:
 - `OPENROUTER_API_KEY=sk-or-...` (your OpenRouter key)
 - `N8N_ENCRYPTION_KEY=` — set any long random string (needed so credentials stay valid across restarts)
 
-### Production (official n8n image)
+### Production (image built from local `./n8n` submodule)
+
+Requires the submodule and a one-time (or after UI changes) image build:
 
 ```bash
+git submodule update --init
+./docker/build-prod-image.sh   # pnpm build:n8n → docker compose build → ai-lms/n8n:$N8N_VERSION
 docker compose up -d
 ```
 
 Editor: http://localhost:5678
+
+The prod image includes the same LMS editor strip-down as the submodule (`ai-lms` branch). Re-run `./docker/build-prod-image.sh` after UI patches you want baked into prod.
 
 ### Development (local `n8n/` submodule — includes UI patches)
 
@@ -49,7 +55,7 @@ docker compose -f docker-compose.dev.yml restart n8n
 
 Hard-refresh http://localhost:5678. Full agent notes (find UI, `LMS:` inventory, allowlist, git): [`AGENTS.md`](../AGENTS.md).
 
-Dev UI is the **stripped student editor** (no main sidebar, flat `+` node allowlist, tabbed NDV, slim header/⋯ menus). Prod compose still serves the stock `n8nio/n8n` image unless you point it at a custom build.
+Dev UI is the **stripped student editor** (no main sidebar, flat `+` node allowlist, tabbed NDV, slim header/⋯ menus). Prod compose builds the same fork into `ai-lms/n8n` via `./docker/build-prod-image.sh`.
 
 ### Optional: host-side UI hot reload
 
@@ -111,8 +117,10 @@ docker compose -f docker-compose.dev.yml up -d
 | `Helper` node red, timeout | Check the machine has internet access; raise node timeout |
 | Empty `answer` | Model returned an error object — check the `Helper` node's raw output JSON |
 | Editor asks for owner again | `N8N_ENCRYPTION_KEY` changed or the `n8n_data` / `postgres_data` volume was wiped |
-| UI patch missing in prod | Prod uses `n8nio/n8n` image (stock). Use `docker-compose.dev.yml` for local UI changes |
-| Wrong n8n version (prod) | Set `N8N_VERSION=2.34.4` in `.env`, then `docker compose pull && docker compose up -d` |
+| UI patch missing in prod | Re-run `./docker/build-prod-image.sh` then `docker compose up -d` (prod bakes `./n8n`, not Hub) |
+| Wrong n8n version (prod) | Set `N8N_VERSION=2.34.4` in `.env`, rebuild: `./docker/build-prod-image.sh && docker compose up -d` |
+| `EACCES … /home/node/.n8n/config` | Prod image runs as uid 1000; volume was written as root by old dev mounts. Fix: `docker run --rm -v <project>_n8n_data:/data alpine chown -R 1000:1000 /data` (dev now uses `n8n_data_dev`) |
+| `compiled/` missing on `docker compose build` | Run `./docker/build-prod-image.sh` first (creates `n8n/compiled`) |
 
 ## Stop / reset
 

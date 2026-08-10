@@ -58,8 +58,8 @@ services:
       - ./n8n:/app
       # Persist pnpm store across rebuilds
       - n8n_pnpm_store:/root/.local/share/pnpm/store
-      # n8n runtime data (encryption key cache, etc.)
-      - n8n_data:/root/.n8n
+      # Dev runtime data (separate from prod n8n_data — prod image runs as user `node`)
+      - n8n_data_dev:/root/.n8n
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,5 +68,5 @@ services:
 
 volumes:
   postgres_data:
-  n8n_data:
+  n8n_data_dev:
   n8n_pnpm_store:

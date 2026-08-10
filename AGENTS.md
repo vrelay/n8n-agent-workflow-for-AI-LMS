@@ -176,7 +176,8 @@ docker compose -f docker-compose.dev.yml logs n8n --tail 50
 docker compose -f docker-compose.dev.yml exec n8n pnpm install
 # or delete n8n/node_modules + dist and restart compose so entrypoint rebuilds
 
-# Prod (stock image, no UI patches)
+# Prod (image from local ./n8n — LMS UI included)
+./docker/build-prod-image.sh
 docker compose up -d
 ```
 

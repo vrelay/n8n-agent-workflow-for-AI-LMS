@@ -1,5 +1,7 @@
-# Production stack — Postgres + official n8n image
-# Usage: docker compose up -d
+# Production stack — Postgres + n8n built from local ./n8n submodule (LMS fork)
+# Usage:
+#   ./docker/build-prod-image.sh   # compile + docker build (required once / after UI changes)
+#   docker compose up -d
 #
 # Editor: http://localhost:5678
 
@@ -22,7 +24,15 @@ services:
       retries: 10
 
   n8n:
-    image: n8nio/n8n:${N8N_VERSION:-2.34.4}
+    # Built from ./n8n (ai-lms fork), not the stock n8nio/n8n Hub image.
+    # Requires compiled/ — run ./docker/build-prod-image.sh first.
+    image: ai-lms/n8n:${N8N_VERSION:-2.34.4}
+    build:
+      context: ./n8n
+      dockerfile: docker/images/n8n/Dockerfile
+      args:
+        N8N_VERSION: ${N8N_VERSION:-2.34.4}
+        N8N_RELEASE_TYPE: stable
     restart: unless-stopped
     ports:
       - "5678:5678"
@@ -42,6 +52,8 @@ services:
       GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-Asia/Kolkata}
       TZ: ${GENERIC_TIMEZONE:-Asia/Kolkata}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:

@@ -77,19 +77,22 @@ Both include Postgres. Editor: http://localhost:5678
 ```
 n8n-agent-workflow-for-AI-LMS/
   README.md
+  AGENTS.md                   # for agents: find UI, LMS comment style, rebuild cmds
   docker-compose.yml          # prod: Postgres + n8nio/n8n
   docker-compose.dev.yml      # dev: Postgres + local n8n/ mount
   Dockerfile.dev              # Node 24 image for the dev n8n service
   docker/dev-entrypoint.sh    # install/build if needed, then pnpm start
   .env.example                # OPENROUTER_API_KEY, DB creds, n8n env
-  n8n/                        # official n8n monorepo @ 2.34.4 (git submodule)
+  n8n/                        # fork submodule (vrelay/n8n, branch ai-lms)
     packages/frontend/editor-ui/   # editor UI — edit here for UI changes
   workflows/
     homework-helper.json      # the golden lesson, import into n8n
   docs/
-    runbook.md                # start, import, set key, verify
+    runbook.md                # start, import, set key, verify, UI rebuild
     tenancy.md                # per-tenant strategy (later)
 ```
+
+**Agents / UI customization:** see [`AGENTS.md`](./AGENTS.md) (how we find routes/views, `LMS:` comment-out pattern, fast rebuild).
 
 ---
 

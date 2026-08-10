@@ -1,0 +1,18 @@
+---
+description: LMS n8n customization — comment-out style, UI find paths, rebuild workflow
+alwaysApply: true
+---
+
+# AI LMS / n8n agent rules
+
+Before editing n8n UI or Docker in this repo, read **`AGENTS.md`** at the repo root.
+
+## Must follow
+
+- All n8n code changes go in the **`n8n/` submodule** (fork `vrelay/n8n`, branch `ai-lms`), not by vendoring a copy elsewhere.
+- Prefer **comment-out** with `LMS:` / `<!-- LMS: … -->` markers over deleting stock UI.
+- Find UI via route → view → layout/slots; start searches under `n8n/packages/frontend/editor-ui/`.
+- After UI edits: `pnpm --filter n8n-editor-ui build` then `docker compose -f docker-compose.dev.yml restart n8n` (dev serves built assets, not live Vite by default).
+- Commit submodule first, push `ai-lms`, then bump parent submodule SHA.
+
+Do not invent a parallel frontend. Hide chrome; keep lesson workflows in parent `workflows/`.

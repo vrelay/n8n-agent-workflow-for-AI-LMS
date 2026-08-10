@@ -37,6 +37,18 @@ Editor: http://localhost:5678
 
 On first open, n8n asks you to **create an owner account** — this is mandatory since n8n 1.0 and cannot be disabled. The session persists across restarts (stored in the `n8n_data` Docker volume).
 
+### Fast UI refresh after editing `editor-ui`
+
+Dev compose serves the **built** editor (`pnpm start`), so Vue/TS edits need a rebuild:
+
+```bash
+export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"   # Node ≥ 22
+cd n8n && pnpm --filter n8n-editor-ui build && cd ..
+docker compose -f docker-compose.dev.yml restart n8n
+```
+
+Hard-refresh http://localhost:5678. Full agent notes (find UI, `LMS:` comments, git): [`AGENTS.md`](../AGENTS.md).
+
 ### Optional: host-side UI hot reload
 
 With the **dev** stack (or any n8n backend) already on `:5678`:

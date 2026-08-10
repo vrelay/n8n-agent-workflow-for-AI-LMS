@@ -2,7 +2,7 @@
 
 A learning platform for **class 6–8 students** to learn **agentic AI** by building simple workflows — watch a tutorial, redo it hands-on with guidance, then create their own.
 
-The platform is **stock n8n**, self-hosted. No fork, no custom UI, no custom nodes. Lessons are **n8n workflows** imported and executed in n8n. We constrain the student experience by using only a small set of nodes — not by modifying n8n.
+Lessons are **n8n workflows**, imported and executed in n8n. We constrain the student experience by using only a small set of nodes — not by modifying n8n's behaviour.
 
 ---
 
@@ -24,20 +24,20 @@ Only the modules that teach clear ideas (trigger → agent → output, tools lat
 
 | Item | Detail |
 |------|--------|
-| Lesson | **Homework Helper** — answer a question using only the student’s pasted notes |
+| Lesson | **Homework Helper** — answer a question using only the student's pasted notes |
 | Workflow | Manual Trigger → `My Notes` (Set) → `Helper` (HTTP to OpenRouter) → response shown in n8n execution output |
-| Engine | n8n’s own runner, in Docker |
+| Engine | n8n **from source** (cloned monorepo in `n8n/`), Postgres in Docker |
 | LLM | OpenRouter via HTTP Request node (key from env / operator) |
-| Auth | None (single shared instance, local/demo) |
-| Tenancy | One shared n8n + Postgres. Per-tenant = duplicate this compose stack later |
+| Auth | n8n's built-in owner account (mandatory since n8n 1.0) |
+| Tenancy | One shared n8n + Postgres. Per-tenant = duplicate this setup later |
 | Video LMS | Out of scope |
 
 ### Success for the starter
 
-- `docker compose up` brings up n8n
+- Postgres is up (`docker compose up -d`) and n8n runs from source
 - Import `workflows/homework-helper.json`
 - Edit the `My Notes` node (or Set nodes) with notes + question
-- **Execute** — the final node’s output shows a short answer grounded in the notes
+- **Execute** — the final node's output shows a short answer grounded in the notes
 
 ---
 
@@ -53,44 +53,35 @@ Only the modules that teach clear ideas (trigger → agent → output, tools lat
 2. **Helper** (HTTP Request node) — POST to OpenRouter with a fixed system prompt: answer only from notes, short, easy English
 3. **Result** — read the answer in the n8n execution panel (no extra UI in v0)
 
-**Pass criteria:** Execute completes and the last node’s JSON contains an answer that uses the notes.
+**Pass criteria:** Execute completes and the last node's JSON contains an answer that uses the notes.
 
 Lesson 2 candidate (same nodes): **Quiz Coach** — notes in → three easy Q&As out.
 
 ---
 
-## Future goals
+## n8n from source
 
-- Full lesson catalog (workflow thinking → agent + tool → plan/act → approval)
-- Guided mode (likely an n8n fork for editor constraints — decided only after the plain workflow proves the pedagogy)
-- Teacher/classroom views, progress, saved workflows
-- Safe tool nodes, auth
-- **Multi-tenant**: one Docker stack per tenant (see `docs/tenancy.md`)
+The platform runs the **official n8n editor from a cloned source tree**, so UI changes can be made directly in n8n's own frontend packages.
 
----
-
-## Design principles
-
-1. **Curriculum first** — nodes appear because a lesson needs them
-2. **No custom anything in v0** — stock n8n, workflows as the deliverable
-3. **Docker is the unit** — shared stack now; per-tenant stack later (no shared-DB tenancy gymnastics)
-4. **Kid-safe defaults** — fixed prompts and models inside workflows; keys only in env
-5. **Avoid hybrid** — do not build a separate canvas that calls n8n’s API with partial graphs
-
----
+- **Pinned version:** `n8n@2.34.4` (latest stable, tag `n8n@2.34.4`, shallow-cloned into `n8n/`)
+- **UI package to edit:** `n8n/packages/frontend/editor-ui` (the Vue workflow editor; the full monorepo is required — editor-ui does not run standalone)
+- **Requirements:** Node >= 22.22 (we use Node 24 via nvm) and pnpm >= 10.22 (via corepack)
+- **Update n8n later:** `cd n8n && git fetch --depth 1 origin tag n8n@<new-version> && git switch --detach n8n@<new-version>` then reinstall/build
 
 ## Repo layout
 
 ```
 n8n-agent-workflow-for-AI-LMS/
   README.md
-  docker-compose.yml          # n8n + postgres (shared)
-  .env.example                # OPENROUTER_API_KEY, DB creds
+  docker-compose.yml          # Postgres only (n8n runs from source)
+  .env.example                # OPENROUTER_API_KEY, DB creds, n8n env
+  n8n/                        # official n8n monorepo @ 2.34.4 (gitignored, local checkout)
+    packages/frontend/editor-ui/   # editor UI — edit here for UI changes
   workflows/
     homework-helper.json      # the golden lesson, import into n8n
   docs/
     runbook.md                # start, import, set key, verify
-    tenancy.md                # per-tenant compose strategy (later)
+    tenancy.md                # per-tenant strategy (later)
 ```
 
 ---
@@ -99,18 +90,30 @@ n8n-agent-workflow-for-AI-LMS/
 
 ```bash
 cp .env.example .env
-# edit .env: set OPENROUTER_API_KEY
-docker compose up -d
+# edit .env: set OPENROUTER_API_KEY and N8N_ENCRYPTION_KEY
+docker compose up -d          # Postgres on :5432
+
+cd n8n
+corepack enable               # pnpm 10.32.1
+pnpm install && pnpm build
+set -a && source ../.env && set +a
+pnpm start                    # editor at http://localhost:5678
 ```
 
-Then open http://localhost:5678, import `workflows/homework-helper.json`, and follow `docs/runbook.md`.
+Then:
+
+1. Open http://localhost:5678 — create the owner account (one-time; login is mandatory since n8n 1.0)
+2. **Workflows → Import from File** → pick `workflows/homework-helper.json`
+3. **Execute workflow** — the answer appears in the output panel
+
+Full details in `docs/runbook.md`.
 
 ---
 
 ## Out of scope (for now)
 
-- Auth, accounts, SSO
-- Custom n8n fork / custom nodes / custom canvas
+- Auth/accounts beyond n8n's built-in owner
+- Custom nodes / custom canvas
 - Video hosting
 - Multi-tenant automation
 
@@ -119,6 +122,6 @@ Then open http://localhost:5678, import `workflows/homework-helper.json`, and fo
 ## Status
 
 - [x] Product framing
-- [x] Stock-n8n starter: compose + Homework Helper workflow
-- [ ] Guided mode decision (fork vs. overlay) — only after v0 proves out
+- [x] n8n-from-source starter: Postgres compose + Homework Helper workflow
+- [ ] Guided mode (UI edits live in `n8n/packages/frontend/editor-ui`)
 - [ ] Multi-tenant compose-per-tenant — later

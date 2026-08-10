@@ -121,6 +121,11 @@ Search for `LMS:` markers under `editor-ui`. Inventory (comment-outs / slimmed m
 - `NodeDetailsViewV2.vue` — Input / Config / Output **tabs** (one panel at a time) instead of stock 3-column resize layout; defaults to Config
 - `NDVHeader.vue` — Docs link hidden
 
+**Build-along lesson guides**
+- `features/lms/guide/` — JSON-driven guide runner (`lmsGuide.store.ts`, `parseGuide.ts`, `evaluateWaitFor.ts`, `resolveHighlight.ts`, `useLmsGuideRunner.ts`) + `LmsGuideOverlay.vue` (v-onboarding) mounted in `WorkflowLayout.vue` `#overlays`
+- `ActionsDropdownMenu.vue` + `app/constants/actions.ts` — ⋯ menu **Import lesson guide** reads a guide JSON and starts the tour (does not replace the workflow)
+- Authoring lives in parent `lessons/` (e.g. `lessons/notes-helper.guide.json`); schema version 1, steps = `highlight` (ui testId / node type+name) + `waitFor` (nodeAdded / nodesConnected / nodeHasParam / manual)
+
 ---
 
 

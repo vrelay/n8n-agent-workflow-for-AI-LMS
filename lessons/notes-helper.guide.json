@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "id": "notes-helper",
+  "title": "Build a notes helper",
+  "steps": [
+    {
+      "id": "add-trigger",
+      "title": "Step 1 — Add a Manual Trigger",
+      "body": "Click the + on the canvas and choose Manual Trigger. This starts your workflow when you press Execute.",
+      "highlight": { "kind": "ui", "testId": "canvas-add-button" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.manualTrigger" }
+    },
+    {
+      "id": "add-set",
+      "title": "Step 2 — Add Edit Fields",
+      "body": "Click + again and add an Edit Fields (Set) node. We will keep our class notes here.",
+      "highlight": { "kind": "ui", "testId": "canvas-add-button" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.set" }
+    },
+    {
+      "id": "connect-trigger-set",
+      "title": "Step 3 — Connect Trigger to Edit Fields",
+      "body": "Drag from the dot on the right of the trigger to the left side of Edit Fields.",
+      "highlight": { "kind": "node", "type": "n8n-nodes-base.set" },
+      "waitFor": {
+        "kind": "nodesConnected",
+        "fromType": "n8n-nodes-base.manualTrigger",
+        "toType": "n8n-nodes-base.set"
+      }
+    },
+    {
+      "id": "fill-notes",
+      "title": "Step 4 — Add notes and a question",
+      "body": "Open Edit Fields and add two text fields: notes (paste a short paragraph from your class) and question (what you want to ask).",
+      "highlight": { "kind": "node", "type": "n8n-nodes-base.set" },
+      "waitFor": { "kind": "manual" }
+    },
+    {
+      "id": "add-http",
+      "title": "Step 5 — Add HTTP Request",
+      "body": "Add an HTTP Request node after Edit Fields. It will call the AI API for us.",
+      "highlight": { "kind": "ui", "testId": "canvas-add-button" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.httpRequest" }
+    },
+    {
+      "id": "connect-set-http",
+      "title": "Step 6 — Connect Edit Fields to HTTP Request",
+      "body": "Drag from Edit Fields to HTTP Request so your notes flow into the request.",
+      "highlight": { "kind": "node", "type": "n8n-nodes-base.httpRequest" },
+      "waitFor": {
+        "kind": "nodesConnected",
+        "fromType": "n8n-nodes-base.set",
+        "toType": "n8n-nodes-base.httpRequest"
+      }
+    },
+    {
+      "id": "configure-http",
+      "title": "Step 7 — Point it at the AI API",
+      "body": "Open HTTP Request, set Method to POST and the URL to the chat completions endpoint your teacher gave you. Send the notes and question in the JSON body. Use the Authorization header your teacher provided — never paste a key into a shared workflow.",
+      "highlight": { "kind": "node", "type": "n8n-nodes-base.httpRequest" },
+      "waitFor": { "kind": "nodeHasParam", "type": "n8n-nodes-base.httpRequest", "path": "url" }
+    },
+    {
+      "id": "finish",
+      "title": "Done — run it",
+      "body": "Press Execute Workflow and check the answer from the HTTP Request output. Great job!",
+      "highlight": { "kind": "ui", "testId": "canvas-add-button" },
+      "waitFor": { "kind": "manual" }
+    }
+  ]
+}

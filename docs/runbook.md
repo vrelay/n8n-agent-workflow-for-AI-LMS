@@ -72,6 +72,21 @@ pnpm dev                      # Vite on :8080
 2. **Workflows → Import from File** → pick `workflows/homework-helper.json`
 3. You should see 4 nodes: **Start → My Notes → Helper (OpenRouter) → Show Answer**
 
+## Build-along lesson guides
+
+Students can import a guided lesson on an **empty** workflow instead of the finished JSON:
+
+1. Create a new workflow (empty canvas)
+2. Workflow header **⋯ → Import lesson guide...** → pick `lessons/notes-helper.guide.json`
+3. A step-by-step overlay walks them through adding Manual Trigger → Edit Fields → HTTP Request and connecting them; Next unlocks once each step is actually done on the canvas
+
+Guide files are plain JSON (`version: 1`, `steps[]` with `highlight` + `waitFor`). After changing anything under `n8n/packages/frontend/editor-ui`, rebuild and restart:
+
+```bash
+docker compose -f docker-compose.dev.yml exec -w /app/packages/frontend/editor-ui n8n pnpm run build
+docker compose -f docker-compose.dev.yml restart n8n
+```
+
 ## Set the OpenRouter key
 
 The `Helper (OpenRouter)` node sends the key from the environment:

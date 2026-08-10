@@ -75,7 +75,7 @@ n8n-agent-workflow-for-AI-LMS/
   README.md
   docker-compose.yml          # Postgres only (n8n runs from source)
   .env.example                # OPENROUTER_API_KEY, DB creds, n8n env
-  n8n/                        # official n8n monorepo @ 2.34.4 (gitignored, local checkout)
+  n8n/                        # official n8n monorepo @ 2.34.4 (git submodule)
     packages/frontend/editor-ui/   # editor UI — edit here for UI changes
   workflows/
     homework-helper.json      # the golden lesson, import into n8n

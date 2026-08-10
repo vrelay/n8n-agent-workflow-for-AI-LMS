@@ -19,7 +19,13 @@ docker compose up -d
 
 ## Run n8n from source
 
-The official n8n monorepo is cloned into `n8n/`, pinned to tag **`n8n@2.34.4`**. Requires Node >= 22.22 (use Node 24 via `nvm use 24`) and pnpm (via `corepack enable`).
+The official n8n monorepo is a **git submodule** at `n8n/`, pinned to tag **`n8n@2.34.4`**. Requires Node >= 22.22 (use Node 24 via `nvm use 24`) and pnpm (via `corepack enable`).
+
+On a fresh clone of this repo, first populate the submodule:
+
+```bash
+git submodule update --init
+```
 
 ```bash
 cd n8n

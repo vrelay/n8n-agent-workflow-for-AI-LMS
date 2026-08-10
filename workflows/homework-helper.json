@@ -1,0 +1,111 @@
+{
+  "name": "Lesson 1 - Homework Helper",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "11111111-1111-1111-1111-111111111111",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 320]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "notes",
+              "value": "The water cycle is how water moves around the Earth. The sun heats water in rivers and oceans, and it evaporates into the air as water vapour. High up, the air is cold, so the vapour condenses into tiny droplets and forms clouds. When the droplets get heavy, they fall as rain or snow. This is called precipitation. The water collects in rivers, lakes and oceans, and the cycle starts again.",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "question",
+              "value": "Why do clouds form?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "My Notes",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.OPENROUTER_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"openai/gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a friendly homework helper for school students in classes 6 to 8. Answer ONLY using the NOTES below. If the answer is not in the notes, say: 'That is not in your notes.' Keep the answer short (2-4 sentences) and in easy English.\\n\\nNOTES:\\n{{ $json.notes }}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.question }}\"\n    }\n  ],\n  \"max_tokens\": 200\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "33333333-3333-3333-3333-333333333333",
+      "name": "Helper (OpenRouter)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 320]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "answer",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "b2",
+              "name": "question",
+              "value": "={{ $('My Notes').item.json.question }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "44444444-4444-4444-4444-444444444444",
+      "name": "Show Answer",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 320]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "My Notes", "type": "main", "index": 0 }]]
+    },
+    "My Notes": {
+      "main": [[{ "node": "Helper (OpenRouter)", "type": "main", "index": 0 }]]
+    },
+    "Helper (OpenRouter)": {
+      "main": [[{ "node": "Show Answer", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": []
+}

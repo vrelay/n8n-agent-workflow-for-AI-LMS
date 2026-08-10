@@ -1,7 +1,12 @@
-# Production stack — Postgres + official n8n image
-# Usage: docker compose up -d
+# Development stack — Postgres + n8n from local submodule (./n8n)
+# Usage: docker compose -f docker-compose.dev.yml up --build
 #
+# Includes your UI edits under n8n/packages/frontend/editor-ui.
 # Editor: http://localhost:5678
+#
+# Optional Vite HMR (second terminal / override command):
+#   docker compose -f docker-compose.dev.yml run --rm -p 8080:8080 n8n \
+#     pnpm --filter n8n-editor-ui dev -- --host 0.0.0.0
 
 services:
   postgres:
@@ -22,10 +27,13 @@ services:
       retries: 10
 
   n8n:
-    image: n8nio/n8n:${N8N_VERSION:-2.34.4}
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     restart: unless-stopped
     ports:
       - "5678:5678"
+      - "8080:8080"
     environment:
       DB_TYPE: postgresdb
       DB_POSTGRESDB_HOST: postgres
@@ -42,12 +50,23 @@ services:
       GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-Asia/Kolkata}
       TZ: ${GENERIC_TIMEZONE:-Asia/Kolkata}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      # Avoid interactive prompts / telemetry noise in containers
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
     volumes:
-      - n8n_data:/home/node/.n8n
+      # Live source (UI patches land here)
+      - ./n8n:/app
+      # Persist pnpm store across rebuilds
+      - n8n_pnpm_store:/root/.local/share/pnpm/store
+      # n8n runtime data (encryption key cache, etc.)
+      - n8n_data:/root/.n8n
     depends_on:
       postgres:
         condition: service_healthy
+    # Re-run install/build only when needed (see docker/dev-entrypoint.sh)
+    command: ["pnpm", "start"]
 
 volumes:
   postgres_data:
   n8n_data:
+  n8n_pnpm_store:

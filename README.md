@@ -26,7 +26,7 @@ Only the modules that teach clear ideas (trigger → agent → output, tools lat
 |------|--------|
 | Lesson | **Homework Helper** — answer a question using only the student's pasted notes |
 | Workflow | Manual Trigger → `My Notes` (Set) → `Helper` (HTTP to OpenRouter) → response shown in n8n execution output |
-| Engine | n8n **from source** (cloned monorepo in `n8n/`), Postgres in Docker |
+| Engine | n8n in Docker Compose (prod image or local `n8n/` submodule for UI work) + Postgres |
 | LLM | OpenRouter via HTTP Request node (key from env / operator) |
 | Auth | n8n's built-in owner account (mandatory since n8n 1.0) |
 | Tenancy | One shared n8n + Postgres. Per-tenant = duplicate this setup later |
@@ -34,7 +34,7 @@ Only the modules that teach clear ideas (trigger → agent → output, tools lat
 
 ### Success for the starter
 
-- Postgres is up (`docker compose up -d`) and n8n runs from source
+- `docker compose up -d` (prod) or `docker compose -f docker-compose.dev.yml up --build` (dev)
 - Import `workflows/homework-helper.json`
 - Edit the `My Notes` node (or Set nodes) with notes + question
 - **Execute** — the final node's output shows a short answer grounded in the notes
@@ -59,21 +59,28 @@ Lesson 2 candidate (same nodes): **Quiz Coach** — notes in → three easy Q&As
 
 ---
 
-## n8n from source
+## Docker Compose
 
-The platform runs the **official n8n editor from a cloned source tree**, so UI changes can be made directly in n8n's own frontend packages.
+| File | Mode | n8n |
+|------|------|-----|
+| `docker-compose.yml` | **prod** | official `n8nio/n8n:2.34.4` image |
+| `docker-compose.dev.yml` | **dev** | builds `Dockerfile.dev`, mounts `./n8n` (your UI patches) |
 
-- **Pinned version:** `n8n@2.34.4` (latest stable, tag `n8n@2.34.4`, shallow-cloned into `n8n/`)
-- **UI package to edit:** `n8n/packages/frontend/editor-ui` (the Vue workflow editor; the full monorepo is required — editor-ui does not run standalone)
-- **Requirements:** Node >= 22.22 (we use Node 24 via nvm) and pnpm >= 10.22 (via corepack)
-- **Update n8n later:** `cd n8n && git fetch --depth 1 origin tag n8n@<new-version> && git switch --detach n8n@<new-version>` then reinstall/build
+Both include Postgres. Editor: http://localhost:5678
+
+- **Pinned version:** `N8N_VERSION=2.34.4` in `.env`
+- **UI package to edit (dev):** `n8n/packages/frontend/editor-ui`
+- **Update n8n submodule later:** `cd n8n && git fetch --depth 1 origin tag n8n@<new-version> && git switch --detach n8n@<new-version>`
 
 ## Repo layout
 
 ```
 n8n-agent-workflow-for-AI-LMS/
   README.md
-  docker-compose.yml          # Postgres only (n8n runs from source)
+  docker-compose.yml          # prod: Postgres + n8nio/n8n
+  docker-compose.dev.yml      # dev: Postgres + local n8n/ mount
+  Dockerfile.dev              # Node 24 image for the dev n8n service
+  docker/dev-entrypoint.sh    # install/build if needed, then pnpm start
   .env.example                # OPENROUTER_API_KEY, DB creds, n8n env
   n8n/                        # official n8n monorepo @ 2.34.4 (git submodule)
     packages/frontend/editor-ui/   # editor UI — edit here for UI changes
@@ -91,13 +98,13 @@ n8n-agent-workflow-for-AI-LMS/
 ```bash
 cp .env.example .env
 # edit .env: set OPENROUTER_API_KEY and N8N_ENCRYPTION_KEY
-docker compose up -d          # Postgres on :5432
 
-cd n8n
-corepack enable               # pnpm 10.32.1
-pnpm install && pnpm build
-set -a && source ../.env && set +a
-pnpm start                    # editor at http://localhost:5678
+# Production (stock n8n image)
+docker compose up -d
+
+# OR development (local n8n/ submodule with UI edits)
+git submodule update --init
+docker compose -f docker-compose.dev.yml up --build
 ```
 
 Then:
@@ -122,6 +129,6 @@ Full details in `docs/runbook.md`.
 ## Status
 
 - [x] Product framing
-- [x] n8n-from-source starter: Postgres compose + Homework Helper workflow
-- [ ] Guided mode (UI edits live in `n8n/packages/frontend/editor-ui`)
+- [x] Docker Compose starter: Postgres + n8n (prod image / dev submodule) + Homework Helper workflow
+- [ ] Guided mode (UI edits live in `n8n/packages/frontend/editor-ui`, run via `docker-compose.dev.yml`)
 - [ ] Multi-tenant compose-per-tenant — later

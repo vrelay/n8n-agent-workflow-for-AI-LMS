@@ -1,3 +1,4 @@
 [submodule "n8n"]
 	path = n8n
-	url = https://github.com/n8n-io/n8n.git
+	url = https://github.com/vrelay/n8n.git
+	branch = ai-lms

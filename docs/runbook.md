@@ -11,41 +11,40 @@ Edit `.env` and set:
 - `OPENROUTER_API_KEY=sk-or-...` (your OpenRouter key)
 - `N8N_ENCRYPTION_KEY=` — set any long random string (needed so credentials stay valid across restarts)
 
-Start Postgres (the only Docker service; n8n itself runs from source):
+### Production (official n8n image)
 
 ```bash
 docker compose up -d
 ```
 
-## Run n8n from source
+Editor: http://localhost:5678
 
-The official n8n monorepo is a **git submodule** at `n8n/`, pinned to tag **`n8n@2.34.4`**. Requires Node >= 22.22 (use Node 24 via `nvm use 24`) and pnpm (via `corepack enable`).
+### Development (local `n8n/` submodule — includes UI patches)
 
-On a fresh clone of this repo, first populate the submodule:
+Requires the submodule:
 
 ```bash
 git submodule update --init
 ```
 
 ```bash
-cd n8n
-pnpm install && pnpm build    # first run is slow
-set -a && source ../.env && set +a
-pnpm start
+docker compose -f docker-compose.dev.yml up --build
 ```
+
+First boot may run `pnpm install` / `pnpm build` inside the container if those aren’t already present under `n8n/` (slow). After that it reuses the mounted source.
 
 Editor: http://localhost:5678
 
-On first open, n8n asks you to **create an owner account** — this is mandatory since n8n 1.0 and cannot be disabled (`N8N_USER_MANAGEMENT_DISABLED` was removed; do not set it). The session persists across restarts.
+On first open, n8n asks you to **create an owner account** — this is mandatory since n8n 1.0 and cannot be disabled. The session persists across restarts (stored in the `n8n_data` Docker volume).
 
-For UI development with hot reload, run instead:
+### Optional: host-side UI hot reload
+
+With the **dev** stack (or any n8n backend) already on `:5678`:
 
 ```bash
 cd n8n/packages/frontend/editor-ui
-pnpm dev                      # frontend dev server on :8080
+pnpm dev                      # Vite on :8080
 ```
-
-Keep `pnpm start` (backend, :5678) running in another terminal.
 
 ## Import the lesson
 
@@ -61,9 +60,15 @@ The `Helper (OpenRouter)` node sends the key from the environment:
 Authorization: Bearer {{ $env.OPENROUTER_API_KEY }}
 ```
 
-`.env` sets `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` because recent n8n versions block `$env` in expressions by default — without it you get "access to env denied" at execution. Always start n8n with the env loaded (`set -a && source ../.env && set +a`).
+`.env` sets `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` because recent n8n versions block `$env` in expressions by default — without it you get "access to env denied" at execution. Compose passes `.env` into the n8n container.
 
-If you changed `.env`, restart the n8n process.
+If you changed `.env`, recreate the n8n service:
+
+```bash
+docker compose up -d          # prod
+# or
+docker compose -f docker-compose.dev.yml up -d
+```
 
 ## Run and verify
 
@@ -84,20 +89,21 @@ If you changed `.env`, restart the n8n process.
 
 | Symptom | Fix |
 |---|---|
-| `pnpm install` fails with `Unsupported engine` | Node too old — n8n 2.34.x needs Node >= 22.22. Use `nvm use 24` |
-| n8n can't reach Postgres | Postgres must be up (`docker compose up -d`) and `.env` must point at `localhost:5432` |
-| `Access to env denied` | n8n blocks `$env` in expressions by default — start n8n with `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` (it is in `.env`) |
-| 401 from OpenRouter | `OPENROUTER_API_KEY` missing/wrong in `.env`; restart n8n |
+| `pnpm install` fails with `Unsupported engine` | Node too old — n8n 2.34.x needs Node >= 22.22. Use Node 24 in Dockerfile.dev / nvm |
+| n8n can't reach Postgres | Use Compose (`DB_POSTGRESDB_HOST=postgres`). If running n8n on the host, Postgres must be up and `.env` must use `localhost` |
+| Port 5678 already in use | Stop a host `pnpm start` / old container: `docker compose down` |
+| `Access to env denied` | Ensure `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` in `.env` and recreate the n8n container |
+| 401 from OpenRouter | `OPENROUTER_API_KEY` missing/wrong in `.env`; recreate n8n |
 | `Helper` node red, timeout | Check the machine has internet access; raise node timeout |
 | Empty `answer` | Model returned an error object — check the `Helper` node's raw output JSON |
-| Editor asks for owner again | `N8N_ENCRYPTION_KEY` changed or `~/.n8n` / the DB was wiped |
-| Wrong n8n version | `cd n8n && git fetch --depth 1 origin tag n8n@<version> && git switch --detach n8n@<version>`, then `pnpm install && pnpm build` |
+| Editor asks for owner again | `N8N_ENCRYPTION_KEY` changed or the `n8n_data` / `postgres_data` volume was wiped |
+| UI patch missing in prod | Prod uses `n8nio/n8n` image (stock). Use `docker-compose.dev.yml` for local UI changes |
+| Wrong n8n version (prod) | Set `N8N_VERSION=2.34.4` in `.env`, then `docker compose pull && docker compose up -d` |
 
 ## Stop / reset
 
 ```bash
-docker compose down            # stop Postgres, keep data
-docker compose down -v         # stop and DELETE the database (fresh start)
+docker compose down                              # prod: stop, keep volumes
+docker compose -f docker-compose.dev.yml down    # dev: stop, keep volumes
+docker compose down -v                           # also DELETE DB + n8n_data
 ```
-
-n8n local state (encryption key if not set in `.env`, settings) lives in `~/.n8n` — delete it for a fully fresh start.

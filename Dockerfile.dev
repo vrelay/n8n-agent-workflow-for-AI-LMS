@@ -1,0 +1,14 @@
+# Dev image: runs the local n8n/ submodule (UI patches included).
+# First boot runs pnpm install + build if node_modules is missing (slow).
+FROM node:24-bookworm
+
+RUN corepack enable
+
+WORKDIR /app
+
+COPY docker/dev-entrypoint.sh /usr/local/bin/dev-entrypoint.sh
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh
+
+EXPOSE 5678 8080
+
+ENTRYPOINT ["/usr/local/bin/dev-entrypoint.sh"]

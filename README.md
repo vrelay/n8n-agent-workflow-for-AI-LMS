@@ -2,7 +2,7 @@
 
 A learning platform for **class 6–8 students** to learn **agentic AI** by building simple workflows — watch a tutorial, redo it hands-on with guidance, then create their own.
 
-Lessons are **n8n workflows**, imported and executed in n8n. We constrain the student experience by using only a small set of nodes — not by modifying n8n's behaviour.
+Lessons are **n8n workflows**, imported and executed in n8n. We constrain the student experience by **hiding stock chrome** and **allowlisting nodes** in the forked editor (`n8n/` submodule, branch `ai-lms`) — not by inventing a parallel app or engine.
 
 ---
 
@@ -14,7 +14,7 @@ Students learn agentic AI best by **doing**, not only watching videos. The produ
 2. **Guided** — recreate the same example with click-by-click help on a premade path
 3. **Free build** — make their own workflow with the same allowed modules
 
-Only the modules that teach clear ideas (trigger → agent → output, tools later) are used. Complex n8n surfaces (OAuth, arbitrary HTTP, dense ops) stay out of lessons for now.
+Only the modules that teach clear ideas (trigger → agent → output, tools later) are used. The canvas `+` panel is limited to `LMS_ALLOWED_NODE_TYPES` (see `AGENTS.md`). Complex n8n surfaces (sidebar projects, publish/share, dense NDV columns, OAuth-heavy flows) stay hidden or out of lessons for now.
 
 ---
 
@@ -133,5 +133,6 @@ Full details in `docs/runbook.md`.
 
 - [x] Product framing
 - [x] Docker Compose starter: Postgres + n8n (prod image / dev submodule) + Homework Helper workflow
-- [ ] Guided mode (UI edits live in `n8n/packages/frontend/editor-ui`, run via `docker-compose.dev.yml`)
+- [x] Student editor strip-down in `n8n/` (`ai-lms`): hide sidebar/tabs/publish/tags; flat node allowlist; tabbed NDV; slim menus — see `AGENTS.md`
+- [ ] Guided mode (click-by-click help on a premade path)
 - [ ] Multi-tenant compose-per-tenant — later

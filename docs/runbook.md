@@ -47,7 +47,9 @@ cd n8n && pnpm --filter n8n-editor-ui build && cd ..
 docker compose -f docker-compose.dev.yml restart n8n
 ```
 
-Hard-refresh http://localhost:5678. Full agent notes (find UI, `LMS:` comments, git): [`AGENTS.md`](../AGENTS.md).
+Hard-refresh http://localhost:5678. Full agent notes (find UI, `LMS:` inventory, allowlist, git): [`AGENTS.md`](../AGENTS.md).
+
+Dev UI is the **stripped student editor** (no main sidebar, flat `+` node allowlist, tabbed NDV, slim header/⋯ menus). Prod compose still serves the stock `n8nio/n8n` image unless you point it at a custom build.
 
 ### Optional: host-side UI hot reload
 

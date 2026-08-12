@@ -84,7 +84,7 @@ n8n-agent-workflow-for-AI-LMS/
   Dockerfile.dev              # Node 24 image for the dev n8n service
   docker/build-prod-image.sh  # compile ./n8n → ai-lms/n8n image
   docker/dev-entrypoint.sh    # install/build if needed, then pnpm start
-  .env.example                # OPENROUTER_API_KEY, DB creds, n8n env
+  .env.example                # OPENROUTER_API_KEY, GEMINI_API_KEY, DB creds, n8n env
   n8n/                        # fork submodule (vrelay/n8n, branch ai-lms)
     packages/frontend/editor-ui/   # editor UI — edit here for UI changes
   workflows/
@@ -124,7 +124,7 @@ cd n8n && git checkout ai-lms && git status && cd ..
 
 ```bash
 cp .env.example .env
-# edit .env: set OPENROUTER_API_KEY and N8N_ENCRYPTION_KEY
+# edit .env: set OPENROUTER_API_KEY (and/or GEMINI_API_KEY) and N8N_ENCRYPTION_KEY
 
 # Production (n8n image built from local ./n8n submodule)
 ./docker/build-prod-image.sh   # fails fast if n8n/ is missing

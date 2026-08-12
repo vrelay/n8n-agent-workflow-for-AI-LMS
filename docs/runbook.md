@@ -22,6 +22,7 @@ cp .env.example .env
 Edit `.env` and set:
 
 - `OPENROUTER_API_KEY=sk-or-...` (your OpenRouter key)
+- `GEMINI_API_KEY=...` (your Google AI Studio / Gemini API key — optional if you use OpenRouter only)
 - `N8N_ENCRYPTION_KEY=` — set any long random string (needed so credentials stay valid across restarts)
 
 ### Production (image built from local `./n8n` submodule)
@@ -102,6 +103,18 @@ The `Helper (OpenRouter)` node sends the key from the environment:
 Authorization: Bearer {{ $env.OPENROUTER_API_KEY }}
 ```
 
+## Set the Gemini key (optional)
+
+For workflows that call Google Gemini directly (instead of OpenRouter), set `GEMINI_API_KEY` in `.env`. Compose also maps it to `GOOGLE_GENERATIVE_AI_API_KEY` for n8n’s built-in Google/Gemini integrations.
+
+Example HTTP Request node:
+
+```text
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+Header: x-goog-api-key: {{ $env.GEMINI_API_KEY }}
+Header: Content-Type: application/json
+```
+
 `.env` sets `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` because recent n8n versions block `$env` in expressions by default — without it you get "access to env denied" at execution. Compose passes `.env` into the n8n container.
 
 If you changed `.env`, recreate the n8n service:
@@ -136,6 +149,7 @@ docker compose -f docker-compose.dev.yml up -d
 | Port 5678 already in use | Stop a host `pnpm start` / old container: `docker compose down` |
 | `Access to env denied` | Ensure `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` in `.env` and recreate the n8n container |
 | 401 from OpenRouter | `OPENROUTER_API_KEY` missing/wrong in `.env`; recreate n8n |
+| 401 / 403 from Gemini | `GEMINI_API_KEY` missing/wrong in `.env`; recreate n8n |
 | `Helper` node red, timeout | Check the machine has internet access; raise node timeout |
 | Empty `answer` | Model returned an error object — check the `Helper` node's raw output JSON |
 | Editor asks for owner again | `N8N_ENCRYPTION_KEY` changed or the `n8n_data` / `postgres_data` volume was wiped |

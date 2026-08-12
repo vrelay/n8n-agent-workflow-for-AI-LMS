@@ -51,6 +51,8 @@ services:
       GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-Asia/Kolkata}
       TZ: ${GENERIC_TIMEZONE:-Asia/Kolkata}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GEMINI_API_KEY}
       # Avoid interactive prompts / telemetry noise in containers
       N8N_DIAGNOSTICS_ENABLED: "false"
       N8N_PERSONALIZATION_ENABLED: "false"

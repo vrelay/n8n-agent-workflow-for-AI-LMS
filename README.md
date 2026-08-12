@@ -130,8 +130,11 @@ cp .env.example .env
 ./docker/build-prod-image.sh   # fails fast if n8n/ is missing
 docker compose up -d
 
-# OR development (bind-mounted ./n8n with faster UI rebuild loop)
+# OR development (bind-mounted ./n8n — rebuild UI inside the container after edits)
 docker compose -f docker-compose.dev.yml up --build
+# after editor-ui changes:
+#   docker compose -f docker-compose.dev.yml exec n8n pnpm --filter n8n-editor-ui build
+#   docker compose -f docker-compose.dev.yml restart n8n
 ```
 
 Then:

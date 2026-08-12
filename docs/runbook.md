@@ -51,15 +51,16 @@ On first open, n8n asks you to **create an owner account** — this is mandatory
 
 ### Fast UI refresh after editing `editor-ui`
 
-Dev compose serves the **built** editor (`pnpm start`), so Vue/TS edits need a rebuild:
+Dev compose serves the **built** editor (`pnpm start`), so Vue/TS edits need a rebuild. Build **inside the running container** (recommended — avoids root-owned `node_modules` / `EACCES` on the host):
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"   # Node ≥ 22
-cd n8n && pnpm --filter n8n-editor-ui build && cd ..
+docker compose -f docker-compose.dev.yml exec n8n pnpm --filter n8n-editor-ui build
 docker compose -f docker-compose.dev.yml restart n8n
 ```
 
 Hard-refresh http://localhost:5678. Full agent notes (find UI, `LMS:` inventory, allowlist, git): [`AGENTS.md`](../AGENTS.md).
+
+**Host alternative** (after `pnpm install` in `n8n/` on the host): same filter from `n8n/`, then restart compose as above. If you get `EACCES` on `.vite-temp`, run `sudo chown -R "$USER:$USER" n8n/`.
 
 Dev UI is the **stripped student editor** (no main sidebar, flat `+` node allowlist, tabbed NDV, slim header/⋯ menus). Prod compose builds the same fork into `ai-lms/n8n` via `./docker/build-prod-image.sh`.
 
@@ -89,7 +90,7 @@ Students can import a guided lesson on an **empty** workflow instead of the fini
 Guide files are plain JSON (`version: 1`, `steps[]` with `highlight` + `waitFor`). After changing anything under `n8n/packages/frontend/editor-ui`, rebuild and restart:
 
 ```bash
-docker compose -f docker-compose.dev.yml exec -w /app/packages/frontend/editor-ui n8n pnpm run build
+docker compose -f docker-compose.dev.yml exec n8n pnpm --filter n8n-editor-ui build
 docker compose -f docker-compose.dev.yml restart n8n
 ```
 
@@ -141,6 +142,7 @@ docker compose -f docker-compose.dev.yml up -d
 | UI patch missing in prod | Re-run `./docker/build-prod-image.sh` then `docker compose up -d` (prod bakes `./n8n`, not Hub) |
 | Wrong n8n version (prod) | Set `N8N_VERSION=2.34.4` in `.env`, rebuild: `./docker/build-prod-image.sh && docker compose up -d` |
 | `EACCES … /home/node/.n8n/config` | Prod image runs as uid 1000; volume was written as root by old dev mounts. Fix: `docker run --rm -v <project>_n8n_data:/data alpine chown -R 1000:1000 /data` (dev now uses `n8n_data_dev`) |
+| `EACCES … editor-ui/node_modules/.vite-temp` | Dev container runs as root; host can't write bind-mounted files. Build in container (see **Fast UI refresh** above) or `sudo chown -R "$USER:$USER" n8n/` |
 | `compiled/` missing on `docker compose build` | Run `./docker/build-prod-image.sh` first (creates `n8n/compiled`) |
 
 ## Stop / reset

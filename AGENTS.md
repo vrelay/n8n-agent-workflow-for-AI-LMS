@@ -144,19 +144,26 @@ docker compose -f docker-compose.dev.yml up --build
 
 ### Fast UI refresh (after editing Vue/TS under editor-ui)
 
-On the **host** (Node ≥ 22 preferred; this machine uses nvm Node 24):
+Dev compose serves the **built** editor, so source edits need a rebuild. **Prefer building inside the running container** — the dev stack runs as root and creates root-owned files under `./n8n`, which causes `EACCES` on host builds.
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"   # adjust if needed
+docker compose -f docker-compose.dev.yml exec n8n pnpm --filter n8n-editor-ui build
+docker compose -f docker-compose.dev.yml restart n8n
+```
+
+Then hard-refresh the browser (cache can stick).
+
+**Host build** (only if you ran `pnpm install` on the host and own the files under `n8n/`):
+
+```bash
+export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"   # adjust if needed; Node ≥ 22
 cd n8n
 pnpm --filter n8n-editor-ui build
 cd ..
 docker compose -f docker-compose.dev.yml restart n8n
 ```
 
-Then hard-refresh the browser (cache can stick).
-
-Rebuild **inside** the container only if host Node/deps match; host rebuild is usually faster and more reliable when `./n8n` is bind-mounted.
+If host build fails with `EACCES` on `.vite-temp`, fix ownership once: `sudo chown -R "$USER:$USER" n8n/`
 
 ### Optional Vite HMR (live UI without full rebuild)
 

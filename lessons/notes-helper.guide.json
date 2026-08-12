@@ -1,71 +1,337 @@
 {
   "version": 1,
   "id": "notes-helper",
-  "title": "Build a notes helper",
+  "title": "Build your Homework Helper",
   "steps": [
     {
-      "id": "add-trigger",
-      "title": "Step 1 — Add a Manual Trigger",
-      "body": "Click the + on the canvas and choose Manual Trigger. This starts your workflow when you press Execute.",
-      "highlight": { "kind": "ui", "testId": "canvas-add-button" },
-      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.manualTrigger" }
+      "id": "welcome",
+      "title": "Welcome!",
+      "body": "You will build a homework helper that reads your notes and answers your question.",
+      "actions": [
+        "Look at the empty canvas — this is where your workflow goes.",
+        "Press Next when you are ready to start."
+      ],
+      "highlight": { "kind": "ui", "testId": "canvas" },
+      "waitFor": { "kind": "manual" },
+      "placement": "bottom"
     },
     {
-      "id": "add-set",
-      "title": "Step 2 — Add Edit Fields",
-      "body": "Click + again and add an Edit Fields (Set) node. We will keep our class notes here.",
+      "id": "click-plus-trigger",
+      "title": "Add a Start button",
+      "body": "Every workflow needs something that starts it.",
+      "actions": [
+        "Find the big + button on the canvas.",
+        "Click the + button."
+      ],
       "highlight": { "kind": "ui", "testId": "canvas-add-button" },
-      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.set" }
+      "waitFor": { "kind": "manual" },
+      "placement": "right"
     },
     {
-      "id": "connect-trigger-set",
-      "title": "Step 3 — Connect Trigger to Edit Fields",
-      "body": "Drag from the dot on the right of the trigger to the left side of Edit Fields.",
+      "id": "pick-manual-trigger",
+      "title": "Pick Manual Trigger",
+      "body": "Manual Trigger lets you run the workflow when you press Execute.",
+      "actions": [
+        "In the panel on the right, click the search box.",
+        "Type Manual Trigger.",
+        "Click Manual Trigger in the list."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-creator" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.manualTrigger" },
+      "placement": "left"
+    },
+    {
+      "id": "click-plus-notes",
+      "title": "Add a notes box",
+      "body": "Next you add a box to hold your class notes and question.",
+      "actions": [
+        "Click the + button on the canvas again."
+      ],
+      "highlight": { "kind": "ui", "testId": "canvas-add-button" },
+      "waitFor": { "kind": "manual" },
+      "placement": "right"
+    },
+    {
+      "id": "pick-edit-fields",
+      "title": "Pick Edit Fields",
+      "body": "Edit Fields is where you type your notes and question.",
+      "actions": [
+        "In the search box, type Edit Fields.",
+        "Click Edit Fields (Set) in the list."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-creator" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.set" },
+      "placement": "left"
+    },
+    {
+      "id": "rename-my-notes",
+      "title": "Name it My Notes",
+      "body": "A clear name helps you find this box later.",
+      "actions": [
+        "Click the name at the top of the Edit Fields box.",
+        "Type My Notes and press Enter."
+      ],
       "highlight": { "kind": "node", "type": "n8n-nodes-base.set" },
+      "waitFor": { "kind": "manual" },
+      "placement": "bottom"
+    },
+    {
+      "id": "connect-start-notes",
+      "title": "Connect Start to My Notes",
+      "body": "Data flows along lines from left to right.",
+      "actions": [
+        "Find the small dot on the right side of the Manual Trigger box.",
+        "Click and drag a line to the left side of the My Notes box.",
+        "Let go when the line connects."
+      ],
+      "highlight": { "kind": "node", "type": "n8n-nodes-base.manualTrigger" },
       "waitFor": {
         "kind": "nodesConnected",
         "fromType": "n8n-nodes-base.manualTrigger",
         "toType": "n8n-nodes-base.set"
-      }
+      },
+      "placement": "bottom"
     },
     {
-      "id": "fill-notes",
-      "title": "Step 4 — Add notes and a question",
-      "body": "Open Edit Fields and add two text fields: notes (paste a short paragraph from your class) and question (what you want to ask).",
-      "highlight": { "kind": "node", "type": "n8n-nodes-base.set" },
-      "waitFor": { "kind": "manual" }
+      "id": "open-my-notes",
+      "title": "Open My Notes",
+      "body": "Now you will add your notes and question inside this box.",
+      "actions": [
+        "Double-click the My Notes box on the canvas."
+      ],
+      "highlight": { "kind": "node", "name": "My Notes" },
+      "waitFor": { "kind": "manual" },
+      "placement": "right"
     },
     {
-      "id": "add-http",
-      "title": "Step 5 — Add HTTP Request",
-      "body": "Add an HTTP Request node after Edit Fields. It will call the AI API for us.",
+      "id": "add-notes-field",
+      "title": "Add your notes",
+      "body": "Paste a short paragraph from your class notes.",
+      "actions": [
+        "In the settings panel, click Add Field (or the + to add a row).",
+        "Set the field name to notes.",
+        "Paste your class notes into the value box."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-parameters" },
+      "waitFor": { "kind": "manual" },
+      "placement": "left"
+    },
+    {
+      "id": "add-question-field",
+      "title": "Add your question",
+      "body": "This is the question you want the helper to answer.",
+      "actions": [
+        "Click Add Field again.",
+        "Set the field name to question.",
+        "Type your question, for example: Why do clouds form?"
+      ],
+      "highlight": { "kind": "ui", "testId": "node-parameters" },
+      "waitFor": { "kind": "manual" },
+      "placement": "left"
+    },
+    {
+      "id": "click-plus-http",
+      "title": "Add the AI helper box",
+      "body": "This box sends your notes to the AI and gets an answer back.",
+      "actions": [
+        "Click the X or Back to close the settings panel.",
+        "Click the + button on the canvas."
+      ],
       "highlight": { "kind": "ui", "testId": "canvas-add-button" },
-      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.httpRequest" }
+      "waitFor": { "kind": "manual" },
+      "placement": "right"
     },
     {
-      "id": "connect-set-http",
-      "title": "Step 6 — Connect Edit Fields to HTTP Request",
-      "body": "Drag from Edit Fields to HTTP Request so your notes flow into the request.",
+      "id": "pick-http-request",
+      "title": "Pick HTTP Request",
+      "body": "HTTP Request talks to the AI service on the internet.",
+      "actions": [
+        "In the search box, type HTTP Request.",
+        "Click HTTP Request in the list."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-creator" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.httpRequest" },
+      "placement": "left"
+    },
+    {
+      "id": "rename-helper",
+      "title": "Name it Helper",
+      "body": "This name tells you this box calls the AI.",
+      "actions": [
+        "Click the name at the top of the HTTP Request box.",
+        "Type Helper (OpenRouter) and press Enter."
+      ],
       "highlight": { "kind": "node", "type": "n8n-nodes-base.httpRequest" },
+      "waitFor": { "kind": "manual" },
+      "placement": "bottom"
+    },
+    {
+      "id": "connect-notes-http",
+      "title": "Connect My Notes to Helper",
+      "body": "Your notes and question must reach the AI box.",
+      "actions": [
+        "Drag a line from the right side of My Notes to the left side of Helper (OpenRouter)."
+      ],
+      "highlight": { "kind": "node", "name": "My Notes" },
       "waitFor": {
         "kind": "nodesConnected",
         "fromType": "n8n-nodes-base.set",
-        "toType": "n8n-nodes-base.httpRequest"
-      }
+        "toType": "n8n-nodes-base.httpRequest",
+        "fromName": "My Notes"
+      },
+      "placement": "bottom"
     },
     {
-      "id": "configure-http",
-      "title": "Step 7 — Point it at the AI API",
-      "body": "Open HTTP Request, set Method to POST and the URL to the chat completions endpoint your teacher gave you. Send the notes and question in the JSON body. Use the Authorization header your teacher provided — never paste a key into a shared workflow.",
-      "highlight": { "kind": "node", "type": "n8n-nodes-base.httpRequest" },
-      "waitFor": { "kind": "nodeHasParam", "type": "n8n-nodes-base.httpRequest", "path": "url" }
+      "id": "open-helper",
+      "title": "Open Helper settings",
+      "body": "You will tell this box where to send your notes.",
+      "actions": [
+        "Double-click the Helper (OpenRouter) box."
+      ],
+      "highlight": { "kind": "node", "name": "Helper (OpenRouter)" },
+      "waitFor": { "kind": "manual" },
+      "placement": "right"
     },
     {
-      "id": "finish",
-      "title": "Done — run it",
-      "body": "Press Execute Workflow and check the answer from the HTTP Request output. Great job!",
+      "id": "set-method-post",
+      "title": "Set Method to POST",
+      "body": "POST is how we send data to the AI service.",
+      "actions": [
+        "Find the Method dropdown.",
+        "Choose POST."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-parameters" },
+      "waitFor": {
+        "kind": "nodeHasParam",
+        "type": "n8n-nodes-base.httpRequest",
+        "name": "Helper (OpenRouter)",
+        "path": "method",
+        "equals": "POST"
+      },
+      "placement": "left"
+    },
+    {
+      "id": "set-url",
+      "title": "Paste the API URL",
+      "body": "Your teacher gave you the web address for the AI service.",
+      "actions": [
+        "Find the URL field.",
+        "Paste this address: https://openrouter.ai/api/v1/chat/completions"
+      ],
+      "highlight": { "kind": "ui", "testId": "node-parameters" },
+      "waitFor": {
+        "kind": "nodeHasParam",
+        "type": "n8n-nodes-base.httpRequest",
+        "name": "Helper (OpenRouter)",
+        "path": "url"
+      },
+      "placement": "left"
+    },
+    {
+      "id": "set-headers-and-body",
+      "title": "Set up the message",
+      "body": "Ask your teacher for the header and body template — do not paste secret keys into a shared screen.",
+      "actions": [
+        "Turn on Send Headers and add Authorization (your teacher set this up).",
+        "Turn on Send Body.",
+        "Set Body Content Type to JSON.",
+        "Copy the JSON body template from your teacher's handout into the JSON field."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-parameters" },
+      "waitFor": { "kind": "manual" },
+      "placement": "left"
+    },
+    {
+      "id": "click-plus-show-answer",
+      "title": "Add a Show Answer box",
+      "body": "This last box makes the answer easy to read.",
+      "actions": [
+        "Close the settings panel.",
+        "Click the + button on the canvas."
+      ],
       "highlight": { "kind": "ui", "testId": "canvas-add-button" },
-      "waitFor": { "kind": "manual" }
+      "waitFor": { "kind": "manual" },
+      "placement": "right"
+    },
+    {
+      "id": "pick-show-answer-fields",
+      "title": "Pick Edit Fields again",
+      "body": "You will use another Edit Fields box to show the answer.",
+      "actions": [
+        "Type Edit Fields in the search box.",
+        "Click Edit Fields (Set) in the list."
+      ],
+      "highlight": { "kind": "ui", "testId": "node-creator" },
+      "waitFor": { "kind": "nodeAdded", "type": "n8n-nodes-base.set", "count": 2 },
+      "placement": "left"
+    },
+    {
+      "id": "rename-show-answer",
+      "title": "Name it Show Answer",
+      "body": "This box will hold the final answer for you to read.",
+      "actions": [
+        "Click the name on the new Edit Fields box.",
+        "Type Show Answer and press Enter."
+      ],
+      "highlight": { "kind": "node", "type": "n8n-nodes-base.set", "index": 1 },
+      "waitFor": { "kind": "manual" },
+      "placement": "bottom"
+    },
+    {
+      "id": "connect-helper-show-answer",
+      "title": "Connect Helper to Show Answer",
+      "body": "The AI answer flows into the Show Answer box.",
+      "actions": [
+        "Drag a line from Helper (OpenRouter) to Show Answer."
+      ],
+      "highlight": { "kind": "node", "name": "Helper (OpenRouter)" },
+      "waitFor": {
+        "kind": "nodesConnected",
+        "fromType": "n8n-nodes-base.httpRequest",
+        "toType": "n8n-nodes-base.set",
+        "fromName": "Helper (OpenRouter)",
+        "toName": "Show Answer"
+      },
+      "placement": "bottom"
+    },
+    {
+      "id": "configure-show-answer",
+      "title": "Set up the answer field",
+      "body": "This pulls the answer text out of the AI response.",
+      "actions": [
+        "Double-click the Show Answer box.",
+        "Add a field named answer.",
+        "In the value box, paste this from your teacher's handout: ={{ $json.choices[0].message.content }}",
+        "Add a field named question with value: ={{ $('My Notes').item.json.question }}"
+      ],
+      "highlight": { "kind": "ui", "testId": "node-parameters" },
+      "waitFor": { "kind": "manual" },
+      "placement": "left"
+    },
+    {
+      "id": "run-workflow",
+      "title": "Run your helper!",
+      "body": "Time to see if it works.",
+      "actions": [
+        "Close the settings panel if it is open.",
+        "Click the Execute workflow button at the bottom of the screen."
+      ],
+      "highlight": { "kind": "ui", "testId": "execute-workflow-button" },
+      "waitFor": { "kind": "manual" },
+      "placement": "top"
+    },
+    {
+      "id": "read-answer",
+      "title": "You did it!",
+      "body": "Your homework helper is ready. Read the answer in the output panel.",
+      "actions": [
+        "Wait for the run to finish (the button stops spinning).",
+        "Click the Show Answer box and open the Output tab to read your answer.",
+        "Press Finish — great job!"
+      ],
+      "highlight": { "kind": "ui", "testId": "output-panel" },
+      "waitFor": { "kind": "manual" },
+      "placement": "left"
     }
   ]
 }

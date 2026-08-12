@@ -113,7 +113,7 @@ Search for `LMS:` markers under `editor-ui`. Inventory (comment-outs / slimmed m
 
 **Canvas / node picker**
 - `nodeCreator.ts` — `LMS_ALLOWED_NODE_TYPES` flat allowlist (Agent, Chat/Manual/Schedule triggers, Set, HTTP Request (+ tool), If/Switch/Merge/Wait/NoOp, Simple Memory, Calculator/Think/Code tools). OpenRouter Chat Model omitted (use HTTP + `$env.OPENROUTER_API_KEY`)
-- `viewsData.ts` / `NodeCreator.vue` — flat A–Z allowlist; stock Trigger/Regular nesting removed; search + AI pickers filter to allowlist
+- `viewsData.ts` / `NodeCreator.vue` — flat A–Z allowlist; stock Trigger/Regular nesting removed; search filtered to allowlist; community / other-category search sections disabled
 - `NodeCreation.vue` — command-bar (Cmd+K) + focus/side-panel canvas buttons hidden
 - `useContextMenuItems.ts` — node ⋯ keeps Open / Rename / Replace / Copy / Duplicate; advanced items (pin, tidy, extract, group, …) dropped
 
@@ -122,7 +122,7 @@ Search for `LMS:` markers under `editor-ui`. Inventory (comment-outs / slimmed m
 - `NDVHeader.vue` — Docs link hidden
 
 **Build-along lesson guides**
-- `features/lms/guide/` — JSON-driven guide runner + fixed left-side `LmsGuideOverlay.vue` panel (mounted in `WorkflowLayout.vue` `#overlays`)
+- `features/lms/guide/` — JSON-driven guide runner + draggable `LmsGuideOverlay.vue` panel (drag title bar to reposition; mounted in `WorkflowLayout.vue` `#overlays`)
 - `ActionsDropdownMenu.vue` + `app/constants/actions.ts` — ⋯ menu **Import lesson guide** reads a guide JSON and starts the tour (does not replace the workflow)
 - Authoring lives in parent `lessons/` (e.g. `lessons/notes-helper.guide.json`); schema version 1, steps = `title` / `body` / optional `actions[]` (numbered do-this lines) / `highlight` (ui testId / node type+name+index) / optional `placement` (popper arrow direction) / `waitFor` (`manual`, `nodeAdded` + optional `count`, `nodesConnected` + optional `fromName`/`toName`, `nodeHasParam` + optional `name`)
 - Overlay teleports to `#lms-guide-root` (z-index 3002, above NDV/modals). NDV backdrop skips the left guide strip and ignores guide clicks; node creator whitelists the panel in `onClickOutside`

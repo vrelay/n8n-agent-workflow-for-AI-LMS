@@ -1,6 +1,7 @@
 # Development stack — Postgres + n8n from local submodule (./n8n)
 # Usage: docker compose -f docker-compose.dev.yml up --build
 #
+# Required first: git clone --recurse-submodules …  (or: git submodule update --init --recursive)
 # Includes your UI edits under n8n/packages/frontend/editor-ui.
 # Editor: http://localhost:5678
 #

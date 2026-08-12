@@ -14,10 +14,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if [[ ! -f n8n/package.json ]]; then
-  echo "error: n8n/ submodule missing — run: git submodule update --init" >&2
-  exit 1
-fi
+# LMS: n8n submodule is required — refuse to build an empty tree
+"$ROOT/scripts/ensure-n8n-submodule.sh"
 
 # Prefer Node 24 from nvm when present (n8n needs >= 22.22)
 if [[ -x "${HOME}/.nvm/versions/node/v24.15.0/bin/node" ]]; then

@@ -98,6 +98,28 @@ n8n-agent-workflow-for-AI-LMS/
 
 ---
 
+## Clone (required — includes `n8n/` submodule)
+
+The `n8n/` fork is a **required** git submodule. Always clone with submodules:
+
+```bash
+git clone --recurse-submodules https://github.com/vrelay/n8n-agent-workflow-for-AI-LMS.git
+cd n8n-agent-workflow-for-AI-LMS
+```
+
+If you already cloned without submodules (empty `n8n/`):
+
+```bash
+git submodule update --init --recursive
+```
+
+Then check you can edit the fork:
+
+```bash
+cd n8n && git checkout ai-lms && git status && cd ..
+# UI edits live under: n8n/packages/frontend/editor-ui/
+```
+
 ## Quick start
 
 ```bash
@@ -105,8 +127,7 @@ cp .env.example .env
 # edit .env: set OPENROUTER_API_KEY and N8N_ENCRYPTION_KEY
 
 # Production (n8n image built from local ./n8n submodule)
-git submodule update --init
-./docker/build-prod-image.sh
+./docker/build-prod-image.sh   # fails fast if n8n/ is missing
 docker compose up -d
 
 # OR development (bind-mounted ./n8n with faster UI rebuild loop)

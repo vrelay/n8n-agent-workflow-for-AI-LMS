@@ -190,6 +190,15 @@ docker compose up -d
 
 ## Git / submodule workflow
 
+`n8n/` is a **required** submodule (`vrelay/n8n`, branch `ai-lms`). Always clone the parent with:
+
+```bash
+git clone --recurse-submodules <parent-repo-url>
+# already cloned empty? → git submodule update --init --recursive
+```
+
+Git cannot force this on every clone from the server; `--recurse-submodules` (or the update command above) is mandatory. Scripts under `docker/` refuse to run if `n8n/package.json` is missing.
+
 ```bash
 # 1) Edit and commit inside the fork checkout
 cd n8n

@@ -2,6 +2,19 @@
 
 ## Start the stack
 
+**First:** make sure `n8n/` is present (required submodule). Fresh clone:
+
+```bash
+git clone --recurse-submodules <parent-repo-url>
+```
+
+Already cloned with an empty `n8n/`?
+
+```bash
+git submodule update --init --recursive
+cd n8n && git checkout ai-lms && cd ..
+```
+
 ```bash
 cp .env.example .env
 ```
@@ -16,7 +29,6 @@ Edit `.env` and set:
 Requires the submodule and a one-time (or after UI changes) image build:
 
 ```bash
-git submodule update --init
 ./docker/build-prod-image.sh   # pnpm build:n8n → docker compose build → ai-lms/n8n:$N8N_VERSION
 docker compose up -d
 ```
@@ -26,12 +38,6 @@ Editor: http://localhost:5678
 The prod image includes the same LMS editor strip-down as the submodule (`ai-lms` branch). Re-run `./docker/build-prod-image.sh` after UI patches you want baked into prod.
 
 ### Development (local `n8n/` submodule — includes UI patches)
-
-Requires the submodule:
-
-```bash
-git submodule update --init
-```
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build

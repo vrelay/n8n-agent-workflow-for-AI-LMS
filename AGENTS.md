@@ -123,6 +123,8 @@ Search for `LMS:` markers under `editor-ui`. Inventory (comment-outs / slimmed m
 
 **Build-along lesson guides**
 - `features/lms/guide/` — JSON-driven guide runner + draggable `LmsGuideOverlay.vue` panel (drag title bar to reposition; mounted in `WorkflowLayout.vue` `#overlays`)
+- `lessonRegistry.ts` + `lessons/*.guide.json` — bundled guides for deep-link auto-start; sync from parent `lessons/` when authoring changes
+- `useLmsLessonDeepLink.ts` — `/workflow/new?lesson=<id>` opens a fresh empty workflow and starts the tour (e.g. `?lesson=notes-helper`); requires logged-in user
 - `ActionsDropdownMenu.vue` + `app/constants/actions.ts` — ⋯ menu **Import lesson guide** reads a guide JSON and starts the tour (does not replace the workflow)
 - Authoring lives in parent `lessons/` (e.g. `lessons/notes-helper.guide.json`); schema version 1, steps = `title` / `body` / optional `actions[]` (numbered do-this lines) / `highlight` (ui testId / node type+name+index) / optional `placement` (popper arrow direction) / `waitFor` (`manual`, `nodeAdded` + optional `count`, `nodesConnected` + optional `fromName`/`toName`, `nodeHasParam` + optional `name`)
 - Overlay teleports to `#lms-guide-root` (z-index 3002, above NDV/modals). NDV backdrop skips the left guide strip and ignores guide clicks; node creator whitelists the panel in `onClickOutside`

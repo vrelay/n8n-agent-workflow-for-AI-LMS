@@ -82,13 +82,21 @@ pnpm dev                      # Vite on :8080
 
 ## Build-along lesson guides
 
-Students can import a guided lesson on an **empty** workflow instead of the finished JSON:
+**One-click demo link** (viewer must be logged in):
+
+```text
+http://localhost:5678/workflow/new?lesson=notes-helper
+```
+
+Opens a fresh empty workflow and auto-starts the Homework Helper build-along. External sites can use the same URL on an “Open demo” button (`target="_blank"`).
+
+Students can also import a guided lesson on an **empty** workflow manually:
 
 1. Create a new workflow (empty canvas)
 2. Workflow header **⋯ → Import lesson guide...** → pick `lessons/notes-helper.guide.json`
 3. A step-by-step panel fixed on the **left edge** walks them through building the full **Homework Helper** flow: Manual Trigger → My Notes → Helper (OpenRouter) → Show Answer. Each step lists numbered actions; **Next** unlocks when `waitFor` checks pass (node added, connected, URL filled, etc.)
 
-Guide files are plain JSON (`version: 1`, `steps[]` with `highlight`, `waitFor`, optional `actions[]` and `placement`). After changing anything under `n8n/packages/frontend/editor-ui`, rebuild and restart:
+Guide files are plain JSON (`version: 1`, `steps[]` with `highlight`, `waitFor`, optional `actions[]` and `placement`). Bundled copies for deep-links live under `n8n/.../features/lms/guide/lessons/` — copy from parent `lessons/` when the guide changes. After changing anything under `n8n/packages/frontend/editor-ui`, rebuild and restart:
 
 ```bash
 docker compose -f docker-compose.dev.yml exec n8n pnpm --filter n8n-editor-ui build

@@ -50,6 +50,8 @@ Editor: http://localhost:5678
 
 On first open, n8n asks you to **create an owner account** — this is mandatory since n8n 1.0 and cannot be disabled. The session persists across restarts (stored in the `n8n_data` Docker volume).
 
+To create the owner (or extra members) **via API** instead of the UI, see [`docs/user-api.md`](./user-api.md) and `./scripts/n8n-create-users.sh`.
+
 ### Fast UI refresh after editing `editor-ui`
 
 Dev compose serves the **built** editor (`pnpm start`), so Vue/TS edits need a rebuild. Build **inside the running container** (recommended — avoids root-owned `node_modules` / `EACCES` on the host):

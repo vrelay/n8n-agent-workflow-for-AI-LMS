@@ -92,6 +92,9 @@ n8n-agent-workflow-for-AI-LMS/
   docs/
     runbook.md                # start, import, set key, verify, UI rebuild
     tenancy.md                # per-tenant strategy (later)
+    user-api.md               # create owner / member via REST (no dashboard)
+  scripts/
+    n8n-create-users.sh       # owner + invite/accept helper for user-api.md
 ```
 
 **Agents / UI customization:** see [`AGENTS.md`](./AGENTS.md) (how we find routes/views, `LMS:` comment-out pattern, fast rebuild).

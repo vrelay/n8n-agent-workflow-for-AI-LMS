@@ -137,3 +137,9 @@ Send a stable `browser-id` header on authenticated calls (same value for login +
 - **`global:admin`** invites need a license; use **`global:member`**.
 - **SSO** — if SSO is enabled, invite/accept are blocked.
 - Public API `POST /api/v1/users` is **Enterprise** — not used here.
+
+---
+
+## Related
+
+- Same-site LMS → editor auto-login (reverse proxy + launch bounce): [`same-site-auto-login.md`](./same-site-auto-login.md)

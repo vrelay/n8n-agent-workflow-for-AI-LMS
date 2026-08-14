@@ -93,6 +93,7 @@ n8n-agent-workflow-for-AI-LMS/
     runbook.md                # start, import, set key, verify, UI rebuild
     tenancy.md                # per-tenant strategy (later)
     user-api.md               # create owner / member via REST (no dashboard)
+    same-site-auto-login.md   # LMS → n8n editor auto-login via reverse proxy
   scripts/
     n8n-create-users.sh       # owner + invite/accept helper for user-api.md
 ```
